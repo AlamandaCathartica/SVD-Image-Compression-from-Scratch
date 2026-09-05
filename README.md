@@ -270,22 +270,6 @@ k90 = np.searchsorted(energy, 0.90) + 1   # smallest k retaining ≥90% energy
 k99 = np.searchsorted(energy, 0.99) + 1   # smallest k retaining ≥99% energy
 ```
 
-### Color images
-
-Each RGB channel gets its own from-scratch SVD and its own optimal rank-`k`
-approximation, then the channels are re-stacked:
-
-```python
-def compress_color_image(rgb_array, k):
-    channels = []
-    for c in range(3):
-        Uc, Sc, Vtc = svd_from_scratch(rgb_array[:, :, c])
-        Uk, Sk, Vtk = compress(Uc, Sc, Vtc, k)
-        channels.append(decompress(Uk, Sk, Vtk))
-    out = np.clip(np.stack(channels, axis=-1), 0, 255)
-    return out.astype(np.uint8)
-```
-
 ## Results
 
 Running the pipeline on a 126×128 test image gives the singular value
@@ -329,7 +313,6 @@ the storage-cost formula above.
 9. **`compress` / `decompress` / `compression_ratio` / `psnr`**.
 10. **Multi-`k` comparison** — reconstructs the image at several ranks, displays compression ratio + PSNR side by side.
 11. **On-disk savings** — writes the truncated factors to `.npz` and compares file size against the raw array.
-12. **Color-image extension**.
 
 ## Why This Works
 
